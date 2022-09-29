@@ -67,7 +67,7 @@ defmodule ExIcal.Event do
             description: nil,
             summary: nil,
             rrule: nil,
-            rdate: nil,
+            rdate: [],
             categories: nil,
             uid: nil
 end
