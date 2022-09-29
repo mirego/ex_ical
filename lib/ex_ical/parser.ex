@@ -34,16 +34,33 @@ defmodule ExIcal.Parser do
   @spec parse(String.t) :: [%Event{}]
   def parse(data) do
     data
-    |> String.replace(~s"\n\t", ~S"\n")
-    |> String.replace(~s"\n\x20", ~S"\n")
-    |> String.replace(~s"\"", "")
-    |> String.split("\n")
+    |> format()
     |> Enum.reduce(%{events: []}, fn(line, data) ->
       line
       |> String.trim()
       |> parse_line(data)
     end)
     |> Map.get(:events)
+  end
+
+  defp format(data) do
+    data
+    |> String.replace(~s"\n\t", ~S"\n")
+    |> String.replace(~s"\n\x20", ~S"\n")
+    |> String.replace(~s"\"", "")
+    |> String.split("\n")
+    |> Enum.reject(& &1 === "")
+    |> Enum.reduce([], & maybe_merge_line_with_previous/2)
+    |> Enum.reverse()
+  end
+
+  defp maybe_merge_line_with_previous(line, []), do: [line]
+  defp maybe_merge_line_with_previous(line, [previous | rest] = acc) do
+    if Regex.match?(~r/^[A-Z]+:|;/, line) do
+      [line | acc]
+    else
+      [(previous <> line) | rest]
+    end
   end
 
   defp parse_line("BEGIN:VEVENT" <> _, data),           do: %{data | events: [%Event{} | data[:events]]}
@@ -54,9 +71,9 @@ defmodule ExIcal.Parser do
   defp parse_line("DESCRIPTION:" <> description, data), do: data |> put_to_map(:description, process_string(description))
   defp parse_line("UID:" <> uid, data),                 do: data |> put_to_map(:uid, uid)
   defp parse_line("RRULE:" <> rrule, data),             do: data |> put_to_map(:rrule, process_rrule(rrule, data[:tzid]))
-  defp parse_line("RDATE" <> rdate, data),             do: data |> put_to_map(:rdate, process_rdate(rdate, data[:tzid]))
+  defp parse_line("RDATE" <> rdate, data),              do: data |> put_to_map(:rdate,  rdate |> sanitize_rdate() |> process_rdate(data[:tzid]))
   defp parse_line("TZID:" <> tzid, data),               do: data |> Map.put(:tzid, tzid)
-  defp parse_line("CATEGORIES:" <> categories, data),    do: data |> put_to_map(:categories, String.split(categories, ","))
+  defp parse_line("CATEGORIES:" <> categories, data),   do: data |> put_to_map(:categories, String.split(categories, ","))
   defp parse_line(_, data), do: data
 
   defp put_to_map(%{events: [event | events]} = data, key, value) do
@@ -86,6 +103,12 @@ defmodule ExIcal.Parser do
         _         -> hash
       end
     end)
+  end
+
+  defp sanitize_rdate(rdate) do
+    ~r/\s+/
+    |> Regex.replace(rdate, "")
+    |> String.replace(~S"\n", "")
   end
 
   defp process_rdate(":" <> date, tzid), do: parse_rdate_dates([date], tzid)
