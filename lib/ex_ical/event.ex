@@ -34,7 +34,7 @@ defmodule ExIcal.Event do
       the iCal `RRULE` property ([4.8.5.4 Recurrence Rule]).
 
     - `rdate`:
-      Defines a a of date/times for a recurrence set. Corresponds to
+      Defines a list of date/times for a recurrence set. Corresponds to
       the iCal `RDATE` property ([4.8.5.3 Recurrence Date/Times).
 
     - `categories`:
