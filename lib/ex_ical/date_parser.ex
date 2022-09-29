@@ -111,10 +111,16 @@ defmodule ExIcal.DateParser do
     |> Timex.to_datetime()
   end
 
-  # Date Format: "19690620", Timezone: *
-  def parse(<< year :: binary-size(4), month :: binary-size(2), day :: binary-size(2) >>, _timezone) do
+  # Date Format: "19690620", Timezone: nil
+  def parse(<< year :: binary-size(4), month :: binary-size(2), day :: binary-size(2) >>, nil) do
     {to_integers({year, month, day}), {0, 0, 0}}
     |> Timex.to_datetime()
+  end
+
+  # Date Format: "19690620", Timezone: *
+  def parse(<< year :: binary-size(4), month :: binary-size(2), day :: binary-size(2) >>, timezone) do
+    {to_integers({year, month, day}), {0, 0, 0}}
+    |> Timex.to_datetime(timezone)
   end
 
   @spec to_integers({String.t, String.t, String.t}) :: {integer, integer, integer}

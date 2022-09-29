@@ -33,6 +33,10 @@ defmodule ExIcal.Event do
       Defines a rule or repeating pattern for recurring events. Corresponds to
       the iCal `RRULE` property ([4.8.5.4 Recurrence Rule]).
 
+    - `rdate`:
+      Defines a list of date/times for a recurrence set. Corresponds to
+      the iCal `RDATE` property ([4.8.5.3 Recurrence Date/Times).
+
     - `categories`:
       Defines the categories for a calendar component. Corresponds to
       the iCal `CATEGORIES` property ([4.8.1.2 Categories Rule]).
@@ -42,14 +46,15 @@ defmodule ExIcal.Event do
       Corresponds to the iCal `UID` property ([4.8.4.7 Unique Identifier]).
 
   [RFC 2445]: https://www.ietf.org/rfc/rfc2445.txt
-  [4.8.2.4 Date/Time Start]:   http://www.kanzaki.com/docs/ical/dtstart.html
-  [4.8.2.2 Date/Time End]:     http://www.kanzaki.com/docs/ical/dtend.html
-  [4.8.7.2 Date/Time Stamp]:   http://www.kanzaki.com/docs/ical/dtstamp.html
-  [4.8.1.5 Description]:       http://www.kanzaki.com/docs/ical/description.html
-  [4.8.1.12 Summary]:          http://www.kanzaki.com/docs/ical/summary.html
-  [4.8.5.4 Recurrence Rule]:   http://www.kanzaki.com/docs/ical/rrule.html
-  [4.8.1.2 Categories Rule]:   https://www.kanzaki.com/docs/ical/categories.html
-  [4.8.4.7 Unique Identifier]: https://www.kanzaki.com/docs/ical/uid.html
+  [4.8.2.4 Date/Time Start]:       http://www.kanzaki.com/docs/ical/dtstart.html
+  [4.8.2.2 Date/Time End]:         http://www.kanzaki.com/docs/ical/dtend.html
+  [4.8.7.2 Date/Time Stamp]:       http://www.kanzaki.com/docs/ical/dtstamp.html
+  [4.8.1.5 Description]:           http://www.kanzaki.com/docs/ical/description.html
+  [4.8.1.12 Summary]:              http://www.kanzaki.com/docs/ical/summary.html
+  [4.8.5.4 Recurrence Rule]:       http://www.kanzaki.com/docs/ical/rrule.html
+  [4.8.5.3 Recurrence Date/Times]: https://www.kanzaki.com/docs/ical/rdate.html
+  [4.8.1.2 Categories Rule]:       https://www.kanzaki.com/docs/ical/categories.html
+  [4.8.4.7 Unique Identifier]:     https://www.kanzaki.com/docs/ical/uid.html
 
   While this covers many of the commonly-used properties of an iCal `VEVENT`,
   `ExIcal` does not yet have full coverage of all valid properties. More
@@ -62,6 +67,7 @@ defmodule ExIcal.Event do
             description: nil,
             summary: nil,
             rrule: nil,
+            rdate: nil,
             categories: nil,
             uid: nil
 end

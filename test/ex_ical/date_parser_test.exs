@@ -16,7 +16,7 @@ defmodule ExIcal.DateParserTest do
     # Input Datestring |   Parsed Date |  Timezone When Global TZID = ?   |
     #                  |               |           nil |  America/Chicago |
     #------------------+--------------------------------------------------+
-    {        "19690620",     date_match,  utc_tzmatch,      utc_tzmatch,},
+    {        "19690620",     date_match,  utc_tzmatch,  chicago_tzmatch,},
     {       "19690620Z",     date_match,  utc_tzmatch,      utc_tzmatch,},
     { "19690620T201804", datetime_match,  utc_tzmatch,  chicago_tzmatch,},
     {"19690620T201804Z", datetime_match,  utc_tzmatch,      utc_tzmatch,},
