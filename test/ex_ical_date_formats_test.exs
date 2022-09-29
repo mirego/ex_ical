@@ -26,7 +26,7 @@ defmodule ExIcal.DateFormatsTest do
     #                               DTSTART input |   Parsed Date |  Timezone with Global TZID = ?   |
     #                                             |               |            nil | America/Chicago |
     #---------------------------------------------+---------------+----------------+-----------------+
-    {                           "DTSTART:19690620",     date_match,    utc_tzmatch,     utc_tzmatch,},
+    {                           "DTSTART:19690620",     date_match,    utc_tzmatch,  chicago_tzmatch},
     {                          "DTSTART:19690620Z",     date_match,    utc_tzmatch,     utc_tzmatch,},
     {                    "DTSTART:19690620T201804", datetime_match,    utc_tzmatch, chicago_tzmatch,},
     {                   "DTSTART:19690620T201804Z", datetime_match,    utc_tzmatch,     utc_tzmatch,},

@@ -40,7 +40,7 @@ defmodule ExIcal.Parser do
     |> String.split("\n")
     |> Enum.reduce(%{events: []}, fn(line, data) ->
       line
-      |> String.trim() 
+      |> String.trim()
       |> parse_line(data)
     end)
     |> Map.get(:events)
@@ -54,6 +54,7 @@ defmodule ExIcal.Parser do
   defp parse_line("DESCRIPTION:" <> description, data), do: data |> put_to_map(:description, process_string(description))
   defp parse_line("UID:" <> uid, data),                 do: data |> put_to_map(:uid, uid)
   defp parse_line("RRULE:" <> rrule, data),             do: data |> put_to_map(:rrule, process_rrule(rrule, data[:tzid]))
+  defp parse_line("RDATE" <> rdate, data),             do: data |> put_to_map(:rdate, process_rdate(rdate, data[:tzid]))
   defp parse_line("TZID:" <> tzid, data),               do: data |> Map.put(:tzid, tzid)
   defp parse_line("CATEGORIES:" <> categories, data),    do: data |> put_to_map(:categories, String.split(categories, ","))
   defp parse_line(_, data), do: data
@@ -84,6 +85,55 @@ defmodule ExIcal.Parser do
         :freq     -> hash |> Map.put(:freq, value)
         _         -> hash
       end
+    end)
+  end
+
+  defp process_rdate(":" <> date, tzid), do: parse_rdate_dates([date], tzid)
+
+  defp process_rdate(";" <> rdate_value, _) do
+    [rtdparams, rtdvals] = rdate_value |> String.split(":")
+
+    splitted_rtdparams = String.split(rtdparams, ";")
+
+    timezone = Enum.find_value(splitted_rtdparams, fn param ->
+      case param do
+        "TZID=" <> timezone -> timezone
+        _ -> nil
+      end
+    end)
+
+    value_type = Enum.find_value(splitted_rtdparams, fn param ->
+      case param do
+        "VALUE=" <> value_type -> value_type
+        _ -> nil
+      end
+    end)
+
+    case value_type do
+      "PERIOD" -> rtdvals |> String.split(",") |> parse_rdate_period_dates(timezone)
+      "DATE-TIME" -> rtdvals |> String.split(",") |> parse_rdate_dates(timezone)
+      "DATE" -> rtdvals |> String.split(",") |> parse_rdate_dates(timezone)
+      _ -> []
+    end
+  end
+
+  defp parse_rdate_period_dates(period_dates, timezone) do
+    Enum.map(period_dates, fn period ->
+      [start_date, end_date] = String.split(period, "/")
+
+      %{
+        start: DateParser.parse(start_date, timezone),
+        end: DateParser.parse(end_date, timezone)
+      }
+    end)
+  end
+
+  defp parse_rdate_dates(dates, timezone) do
+    Enum.map(dates, fn date ->
+      %{
+        start: DateParser.parse(date, timezone),
+        end: nil
+      }
     end)
   end
 
